@@ -50,6 +50,10 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* ── Scrollbar (dark friendly) ──────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

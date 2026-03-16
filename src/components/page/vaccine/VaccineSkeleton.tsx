@@ -36,13 +36,6 @@ export function VaccineSkeleton() {
                             </div>
                             </td>
 
-                            {/* Dibuat Oleh */}
-                            <td className="text-center">
-                            <div className="flex justify-center">
-                                <Skeleton className="h-5 w-24 rounded-full" />
-                            </div>
-                            </td>
-
                             {/* Tanggal Update */}
                             <td className="text-center">
                             <div className="flex justify-center">
