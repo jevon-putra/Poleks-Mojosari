@@ -140,7 +140,7 @@ export default function PoliPage(){
                         open={isOpenManageDialog}
                         editData={editData}
                         onSubmit={handleSubmit}
-                        onClose={ (data) => {  onCloseDialog(data) } }
+                        onClose={ onCloseDialog }
                     />
 
                     <LoadingDialog

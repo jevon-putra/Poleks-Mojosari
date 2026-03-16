@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { Poliklinik } from '@/types/index.types'
 import { getPoli, deletePoli, updatePoli, createPoli} from '@/service/poli.service'
@@ -11,7 +9,6 @@ export function usePoli(usedId: String) {
     const [editData, setEditData] = useState<Poliklinik | null>(null)
     const [isLoadingDialog, setLoadingDialog] = useState(false)
     const [isOpenManageDialog, setOpenManageDialog] = useState(false)
-    const [name, setName] = useState('')
 
     // FETCH DATA
     const fetchData = async () => {

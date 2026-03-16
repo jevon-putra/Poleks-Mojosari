@@ -32,7 +32,6 @@ export function PoliSKeleton() {
                             {/* Nama Poli */}
                             <td>
                             <div className="flex items-center gap-3">
-                                <Skeleton className="h-4 w-4 rounded-full shrink-0" />
                                 <Skeleton className="h-4 w-36" />
                             </div>
                             </td>
