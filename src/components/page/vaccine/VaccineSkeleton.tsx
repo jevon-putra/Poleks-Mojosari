@@ -1,6 +1,6 @@
 import { Skeleton } from "../../ui/skeleton"
 
-export function PoliSKeleton() {
+export function VaccineSkeleton() {
     return (
         <div className="p-6 w-full">
             {/* Header */}
@@ -21,7 +21,7 @@ export function PoliSKeleton() {
                     <table className="data-table">
                     <thead>
                         <tr>
-                        <th className="text-center">Nama Poli</th>
+                        <th className="text-center">Nama Vaksin</th>
                         <th className="text-center">Tanggal Update</th>
                         <th className="text-center">Aksi</th>
                         </tr>

@@ -1,19 +1,23 @@
 'use client'
 
-import { ManagePoliDialog } from "@/components/page/poli/ManagePoliDialog"
-import { PoliSKeleton } from "@/components/page/poli/PoliSkeleton"
+import { ManageVaccineDialog } from "@/components/page/vaccine/ManageVaccineDialog"
+import { VaccineSkeleton } from "@/components/page/vaccine/VaccineSkeleton"
 import { Button } from "@/components/ui/button"
 import { LoadingDialog } from "@/components/ui/LoadingDialog"
 import { useCurrentUser } from "@/hooks/useCurrentUser"
-import { usePoli } from "@/hooks/usePoli"
+import { useVaccine } from "@/hooks/useVaccine"
+import { deleteVaccine, getVaccine } from "@/service/vaccine.service"
+import { Vaksin } from "@/types/index.types"
 import { Pencil, Plus, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
-export default function PoliPage(){
+export default function VaksinPage(){
     const { user } = useCurrentUser()
     const {
-        poliList,
-        editData,
+        vaccineList,
         isLoading,
+        editData,
         isLoadingDialog,
         isOpenManageDialog,
 
@@ -21,26 +25,25 @@ export default function PoliPage(){
         onCloseDialog,
         handleSubmit,
         handleDelete
-    } = usePoli(user?.id ?? '')
-
+    } = useVaccine(user?.id ?? '')
 
     return (
         <div>
             {isLoading ? (
-                <PoliSKeleton/>
+                <VaccineSkeleton/>
             ) : (
                 <div className="p-6 w-full">
                     {/* Header */}
                     <div className="flex items-center justify-between">
-                        <h1 className="page-title">Ruangan Poli</h1>
+                        <h1 className="page-title">Layanan Vaksin</h1>
 
                         <Button 
                             variant="primary" 
                             className="w-auto"
-                            onClick={() => { openDialog(null) }}
+                            onClick={() => openDialog(null)}
                         >
                             <Plus size={16} />
-                            Tambah Poli
+                            Tambah Vaksin
                         </Button>
                     </div>
 
@@ -48,18 +51,16 @@ export default function PoliPage(){
                     <div className="card overflow-hidden mt-6">
 
                         {/* Card Header */}
-                        <div 
-                            className="px-5 py-4 flex items-center justify-between"
-                            style={{ borderBottom: '1px solid var(--border-default)' }}
-                        >
-                            <div>
-                                <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                                    Data Poli
-                                </h2>
-                                <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                                    {poliList.length} data ditemukan
-                                </p>
-                            </div>
+                        <div className="px-5 py-4 flex items-center justify-between"
+                        style={{ borderBottom: '1px solid var(--border-default)' }}>
+                        <div>
+                            <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                            Data Vaksin
+                            </h2>
+                            <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                            {vaccineList.length} data ditemukan
+                            </p>
+                        </div>
                         </div>
 
                         {/* Tabel */}
@@ -67,29 +68,27 @@ export default function PoliPage(){
                             <table className="data-table">
                                 <thead>
                                     <tr>
-                                        <th className="text-center">Nama Poli</th>
+                                        <th className="text-center">Nama Vaksin</th>
                                         <th className="text-center">Terakhir Diubah</th>
                                         <th className="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {poliList.length === 0 ? (
+                                    {vaccineList.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4}>
-                                                <div 
-                                                    className="flex flex-col items-center gap-2 py-12"
-                                                    style={{ color: 'var(--text-muted)' }}
-                                                >
-                                                    <span className="text-3xl">🏥</span>
-                                                    <span className="text-sm">Belum ada data</span>
-                                                </div>
-                                            </td>
+                                        <td colSpan={4}>
+                                            <div className="flex flex-col items-center gap-2 py-12"
+                                            style={{ color: 'var(--text-muted)' }}>
+                                            <span className="text-3xl">🏥</span>
+                                            <span className="text-sm">Belum ada data</span>
+                                            </div>
+                                        </td>
                                         </tr>
                                     ) : (
-                                        poliList.map(r => (
+                                        vaccineList.map(r => (
                                             <tr key={r.id}>
                                                 <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                                                    {r.nama_poli}
+                                                    {r.nama_vaksin}
                                                 </td>
                                                 <td className="text-center" style={{ color: 'var(--text-secondary)' }}>
                                                     {r.updated_at
@@ -124,23 +123,21 @@ export default function PoliPage(){
                         </div>
 
                         {/* Footer */}
-                        {poliList.length > 0 && (
-                            <div 
-                                className="px-5 py-3"
-                                style={{ borderTop: '1px solid var(--border-default)' }}
-                            >
-                                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                    Total {poliList.length} poliklinik
-                                </p>
-                            </div>
+                        {vaccineList.length > 0 && (
+                        <div className="px-5 py-3"
+                            style={{ borderTop: '1px solid var(--border-default)' }}>
+                            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                            Total {vaccineList.length} layanan vaksin
+                            </p>
+                        </div>
                         )}
                     </div>
 
-                    <ManagePoliDialog
+                    <ManageVaccineDialog
                         open={isOpenManageDialog}
                         editData={editData}
                         onSubmit={handleSubmit}
-                        onClose={ onCloseDialog }
+                        onClose={onCloseDialog}
                     />
 
                     <LoadingDialog

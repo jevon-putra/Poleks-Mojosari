@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react'
-import { Poliklinik } from '@/types/index.types'
-import { getPoli, deletePoli, updatePoli, createPoli} from '@/service/poli.service'
-import { toast } from 'sonner'
+import { createVaccine, deleteVaccine, getVaccine, updateVaccine } from "@/service/vaccine.service";
+import { Vaksin } from "@/types/index.types";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export function usePoli(usedId: String) {
-    const [poliList, setPoliList]     = useState<Poliklinik[]>([])
+export function useVaccine(userId: String){
+    const [vaccineList, setVaccineList] = useState<Vaksin[]>([])
     const [isLoading, setLoading] = useState(true)
-    const [editData, setEditData] = useState<Poliklinik | null>(null)
+    const [editData, setEditData] = useState<Vaksin | null>(null)
     const [isLoadingDialog, setLoadingDialog] = useState(false)
     const [isOpenManageDialog, setOpenManageDialog] = useState(false)
 
-    // FETCH DATA
     const fetchData = async () => {
-        getPoli().then(res => {
-            setPoliList(res)
+        getVaccine().then(res => {
+            setVaccineList(res)
             setLoading(false)
         }).catch(err => {
             toast.error(err.message)
@@ -23,33 +22,32 @@ export function usePoli(usedId: String) {
 
     useEffect(() => { fetchData()}, [])
 
-    //ACTION 
-    const openDialog = (poli: Poliklinik | null) => {
-        setEditData(poli)
+    const openDialog = (vaccine: Vaksin | null) => {
+        setEditData(vaccine)
         setOpenManageDialog(true)
     }
 
-    const onCloseDialog = (poli: Poliklinik | null) => {
+    const onCloseDialog = (vaccine: Vaksin | null) => {
         setOpenManageDialog(false)
         setEditData(null)
 
-        if (poli) {
-            const index = poliList.findIndex(d => d.id === poli.id)
+        if (vaccine) {
+            const index = vaccineList.findIndex(d => d.id === vaccine.id)
             if (index !== -1) {
-                poliList[index] = poli
-                setPoliList([...poliList])
+                vaccineList[index] = vaccine
+                setVaccineList([...vaccineList])
             } else {
-                setPoliList([...poliList, poli])
+                setVaccineList([...vaccineList, vaccine])
             }
         }
     }
-
+    
     const handleDelete = async (id: String) => {
         setLoadingDialog(true)
-        deletePoli(id, usedId).then(res => {
+        deleteVaccine(id, userId).then(res => {
             toast.success('Data berhasil dihapus')
-            const indexOf = poliList.findIndex(item => item.id === id)
-            poliList.splice(indexOf, 1)
+            const indexOf = vaccineList.findIndex(item => item.id === id)
+            vaccineList.splice(indexOf, 1)
         }).catch(err => {
             toast.error(err.message)
         }).finally(() => setLoadingDialog(false))
@@ -59,23 +57,23 @@ export function usePoli(usedId: String) {
         setLoadingDialog(true)
 
         if(editData){
-            updatePoli(editData.id, name, usedId).then(res => {
+            updateVaccine(editData.id, name, userId).then(res => {
                 toast.success('Data berhasil diperbarui')
                 onCloseDialog(res)
             }).catch(err => {
                 if(err.message.includes('unique')) {
-                    toast.error('Nama poli sudah pernah digunakan, gunakan nama poli yang berbeda')
+                    toast.error('Nama vaksin sudah pernah digunakan, gunakan nama vaksin yang berbeda')
                 } else {
                     toast.error(err.message)   
                 }
             }).finally(() => setLoadingDialog(false))
         } else {
-            createPoli(name, usedId).then(res => {
+            createVaccine(name, userId).then(res => {
                 toast.success('Data berhasil diperbarui')
                 onCloseDialog(res)
             }).catch(err => {
                 if(err.message.includes('unique')) {
-                    toast.error('Nama poli sudah pernah digunakan, gunakan nama poli yang berbeda')
+                    toast.error('Nama vaksin sudah pernah digunakan, gunakan nama vaksin yang berbeda')
                 } else {
                     toast.error(err.message)   
                 }
@@ -84,7 +82,7 @@ export function usePoli(usedId: String) {
     }
 
     return {
-        poliList,
+        vaccineList,
         isLoading,
         editData,
         isLoadingDialog,
