@@ -34,7 +34,7 @@ export function ManagePoliDialog({ open, editData, onSubmit, onClose }: ManagePo
 
     return (
         <Dialog open={open} onOpenChange={() => onClose(null)}>
-            <DialogContent>
+            <DialogContent showCloseButton={true} preventClose>
                 <DialogHeader
                     titleValue={isEditMode ? 'Edit Poliklinik' : 'Tambah Poliklinik'}
                     description={isEditMode ? 'Edit data poliklinik' : 'Tambah data poliklinik'}

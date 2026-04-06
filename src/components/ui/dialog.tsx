@@ -53,15 +53,19 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  preventClose = false, // ← tambahkan ini
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
+  showCloseButton?: boolean,
+  preventClose?: boolean
 }) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        onInteractOutside={preventClose ? (e) => e.preventDefault() : undefined}
+        onEscapeKeyDown={preventClose ? (e) => e.preventDefault() : undefined}
         className={cn(
           "fixed top-1/2 left-1/2 z-50",
           "-translate-x-1/2 -translate-y-1/2",

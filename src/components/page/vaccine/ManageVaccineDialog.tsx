@@ -34,7 +34,7 @@ export function ManageVaccineDialog({ open, editData, onSubmit, onClose }: Manag
 
     return (
         <Dialog open={open} onOpenChange={() => onClose(null)}>
-            <DialogContent showCloseButton={true}>
+            <DialogContent showCloseButton={true} preventClose>
                 <DialogHeader
                     titleValue={isEditMode ? 'Edit Vaksin' : 'Tambah Vaksin'}
                     description={isEditMode ? 'Edit data vaksin' : 'Tambah data vaksin'}

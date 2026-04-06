@@ -95,7 +95,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
 
     return (
         <Dialog open={open} onOpenChange={() => onClose()}>
-            <DialogContent>
+            <DialogContent showCloseButton={true} preventClose>
                 <DialogHeader
                     titleValue={detailData !== null ? 'Edit Kunjungan' : 'Tambah Kunjungan'}
                     description={detailData !== null ? 'Edit Data Kunjungan' : 'Tambah Data Kunjungan'}
@@ -139,7 +139,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
 
                                             today.setHours(0, 0, 0, 0)
                                             fourDaysAgo.setHours(0, 0, 0, 0)
-                                            fourDaysAgo.setDate(today.getDate() - 4)
+                                            fourDaysAgo.setDate(today.getDate() - 7)
 
                                             return day > today || day < fourDaysAgo
                                         }}
@@ -198,6 +198,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
                                                     variant="default"
                                                     className="input-field"
                                                     disabled={!isEnabledEdit} 
+                                                    onWheel={(e) => e.currentTarget.blur()}
                                                     style={{
                                                         width: '64px',
                                                         height: '32px',
