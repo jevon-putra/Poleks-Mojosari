@@ -4,16 +4,12 @@ import { ManageVaccineDialog } from "@/components/page/vaccine/ManageVaccineDial
 import { VaccineSkeleton } from "@/components/page/vaccine/VaccineSkeleton"
 import { Button } from "@/components/ui/button"
 import { LoadingDialog } from "@/components/ui/LoadingDialog"
-import { useCurrentUser } from "@/hooks/useCurrentUser"
 import { useVaccine } from "@/hooks/useVaccine"
-import { deleteVaccine, getVaccine } from "@/service/vaccine.service"
-import { Vaksin } from "@/types/index.types"
+import { userCache } from "@/lib/userCache"
 import { Pencil, Plus, Trash2 } from "lucide-react"
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
 
 export default function VaksinPage(){
-    const { user } = useCurrentUser()
+    const { get } = userCache
     const {
         vaccineList,
         isLoading,
@@ -25,7 +21,7 @@ export default function VaksinPage(){
         onCloseDialog,
         handleSubmit,
         handleDelete
-    } = useVaccine(user?.id ?? '')
+    } = useVaccine(get()?.id || '')
 
     return (
         <div>

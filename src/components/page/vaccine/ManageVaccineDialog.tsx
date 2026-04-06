@@ -1,10 +1,10 @@
 'use client'
 
-import { X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Button } from "../../ui/button"
 import { Input } from "../../ui/input"
 import { Vaksin } from "@/types/index.types"
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog"
 
 interface ManageVaccineDialogProps {
     open: boolean
@@ -33,67 +33,49 @@ export function ManageVaccineDialog({ open, editData, onSubmit, onClose }: Manag
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)' }}
-            onClick={() => onClose}
-        >
-            <div className="w-full max-w-md rounded-2xl shadow-2xl"
-                style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-default)',
-                }}
-                onClick={e => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4"
-                    style={{ 
-                        borderBottom: '1px solid var(--border-default)' 
-                    }}
-                >
-                    <div className="flex items-center gap-3">
-                        <div>
-                            <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                                {isEditMode ? 'Edit Vaksin' : 'Tambah Vaksin'}
-                            </h3>
-                            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                                {isEditMode ? 'Ubah Nama Vaksin' : 'Masukkan Nama Vaksin'}
-                            </p>
-                        </div>
-                    </div>
-                    <Button
-                        onClick={() => onClose(null)}
-                        variant="primaryOutline"
-                        size='icon'
-                    >
-                        <X size={16} />
-                    </Button>
-                </div>
-
-                {/* Body */}
+        <Dialog open={open} onOpenChange={() => onClose(null)}>
+            <DialogContent showCloseButton={true}>
+                <DialogHeader
+                    titleValue={isEditMode ? 'Edit Vaksin' : 'Tambah Vaksin'}
+                    description={isEditMode ? 'Edit data vaksin' : 'Tambah data vaksin'}
+                />
+                
                 <form onSubmit={handleSubmit}>
-                    <div className="px-6 py-5">
-                        <label className="form-label">Nama Vaksin</label>
-                        <Input
-                            type="text"
-                            variant="default"
-                            className="input-field"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                            placeholder="contoh: Poli Umum, Poli Anak..."
-                            required
-                            autoFocus
-                        />
+                    <DialogBody>
+                        <div>
+                            <label className="form-label">Nama Vaksin</label>
+                            <Input
+                                type="text"
+                                variant="default"
+                                className="input-field"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                placeholder="contoh: Poli Umum, Poli Anak..."
+                                required
+                                autoFocus
+                            />
+                        </div>
+                    </DialogBody>
 
+                    <DialogFooter>
                         <Button
-                            variant="primary"
-                            type="submit"
-                            className="w-full mt-8"
+                            type="button"
+                            variant="ghost"
+                            className="flex-1"
+                            onClick={() => onClose(null)}
                         >
-                            {editData ? 'Simpan Perubahan' : 'Tambah Vaksin'}
+                            Batal
                         </Button>
-                    </div>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            className="flex-1"
+                        >
+                            {editData ? 'Simpan' : 'Tambah'}
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     )
 }

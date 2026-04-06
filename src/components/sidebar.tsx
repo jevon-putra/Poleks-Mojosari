@@ -7,9 +7,10 @@ import {
   LayoutDashboard, Syringe,
   LogOut, Menu, X, ChevronRight,
   Building} from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
-import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { useUser } from '@/hooks/useUser'
+import { toast } from 'sonner'
 
 const navItems = [
   { href: '/',          label: 'Dashboard', icon: LayoutDashboard },
@@ -20,12 +21,16 @@ const navItems = [
 ]
 
 export function Sidebar() {
-  const pathname        = usePathname()
-  const router          = useRouter()
-  const { user }        = useCurrentUser()
-  const [open, setOpen] = useState(false)
+  const pathname                = usePathname()
+  const router                  = useRouter()
+  const { user, refreshUser }   = useUser()
+  const [open, setOpen]         = useState(false)
+  const [isMounted, setMounted] = useState(false)
 
-  if (pathname === '/login') return null
+  useEffect(() => {
+    refreshUser()
+    setMounted(true)
+  }, [])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -34,25 +39,27 @@ export function Sidebar() {
       router.refresh()
     }).catch((error) => {
       console.error(error)
+      toast.error(error.message)
     })
   }
 
-  const initials = user?.full_name
+  const initials = isMounted ? user?.full_name
     ?.split(' ')
     .map(w => w[0])
     .slice(0, 2)
     .join('')
-    .toUpperCase() ?? '?'
+    .toUpperCase() ?? 'PL' : 'PL'
 
   const roleBadge: Record<string, { bg: string; color: string }> = {
     admin:   { bg: 'rgba(249,115,22,0.15)',  color: '#FB923C' },
     petugas: { bg: 'rgba(46,134,171,0.15)',  color: '#60A5FA' },
     public:  { bg: 'rgba(34,197,94,0.15)',   color: '#4ADE80' },
   }
+  
+  const badge = roleBadge[isMounted ? user?.role ?? '' : ''] ?? roleBadge.public
 
-  const badge = roleBadge[user?.role ?? ''] ?? roleBadge.public
+  if (pathname === '/login') return null
 
-  // ── Konten sidebar (dipakai di desktop & mobile drawer) ──
   const SidebarContent = () => (
     <>
       {/* Header */}
@@ -97,12 +104,12 @@ export function Sidebar() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate"
               style={{ color: 'var(--text-primary)' }}>
-              {user?.full_name ?? 'Loading...'}
+              {isMounted ? user?.full_name! : 'Nurse'}
             </p>
             {/* Role badge */}
             <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-regular mt-0.5"
               style={{ background: badge.bg, color: badge.color }}>
-              {(user?.role ?? '-').toUpperCase()}
+              {(isMounted ? user?.role! : "Public").toUpperCase()}
             </span>
           </div>
         </div>

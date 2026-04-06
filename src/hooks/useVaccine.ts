@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function useVaccine(userId: String){
-    const [vaccineList, setVaccineList] = useState<Vaksin[]>([])
-    const [isLoading, setLoading] = useState(true)
-    const [editData, setEditData] = useState<Vaksin | null>(null)
-    const [isLoadingDialog, setLoadingDialog] = useState(false)
+    const [vaccineList, setVaccineList]             = useState<Vaksin[]>([])
+    const [isLoading, setLoading]                   = useState(true)
+    const [editData, setEditData]                   = useState<Vaksin | null>(null)
+    const [isLoadingDialog, setLoadingDialog]       = useState(false)
     const [isOpenManageDialog, setOpenManageDialog] = useState(false)
 
     const fetchData = async () => {
@@ -20,7 +20,7 @@ export function useVaccine(userId: String){
         })
     }
 
-    useEffect(() => { fetchData()}, [])
+    useEffect(() => { fetchData() }, [])
 
     const openDialog = (vaccine: Vaksin | null) => {
         setEditData(vaccine)

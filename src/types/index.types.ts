@@ -53,6 +53,12 @@ export interface UserProfile {
 }
 
 // ─── Form Payloads (untuk create/update) ──────────
+export interface KunjunganGrouped {
+  tanggal:      string
+  total_pasien: number
+  detail:       KunjunganHarian[]
+}
+
 export type KunjunganPayload = {
   tanggal: string
   poliklinik_id: string

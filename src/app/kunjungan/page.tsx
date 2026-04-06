@@ -1,78 +1,68 @@
 'use client'
 
+import { ManageKunjunganDialog } from "@/components/page/kunjungan/ManageKunjunganDialog"
 import { Button } from "@/components/ui/button"
-import { usePoli } from "@/hooks/usePoli"
-import { Pencil, Plus, Trash2 } from "lucide-react"
-import { userCache } from "@/lib/userCache"
-import { PoliSKeleton } from "@/components/page/poli/PoliSkeleton"
-import { ManagePoliDialog } from "@/components/page/poli/ManagePoliDialog"
 import { LoadingDialog } from "@/components/ui/LoadingDialog"
+import { useKunjungan } from "@/hooks/useKunjungan"
+import { userCache } from "@/lib/userCache"
+import { Eye, Plus } from "lucide-react"
+import { useEffect } from "react"
+import { format } from 'date-fns'
+import { id as localeId } from 'date-fns/locale'
+import { KunjunganSkeleton } from "@/components/page/kunjungan/KunjunganSkeleton"
 
-export default function PoliPage(){
+export default function KunjunganPage() {
     const { get } = userCache
     const {
-        poliList,
-        editData,
         isLoading,
         isLoadingDialog,
         isOpenManageDialog,
+        kunjunganList,
+        kunjunganHarian,
 
         openDialog,
         onCloseDialog,
-        handleSubmit,
-        handleDelete
-    } = usePoli(get()?.id || '')
+        getKunjungan
+    } = useKunjungan(get()?.id || '')
+
+    useEffect(() => {
+        getKunjungan()
+    }, [])
 
     return (
         <div>
             {isLoading ? (
-                <PoliSKeleton/>
+                <KunjunganSkeleton/>
             ) : (
                 <div className="p-6 w-full">
                     {/* Header */}
                     <div className="flex items-center justify-between">
-                        <h1 className="page-title">Ruangan Poli</h1>
-
+                        <h1 className="page-title">Kunjungan Poli</h1>
                         <Button 
                             variant="primary" 
                             className="w-auto"
-                            onClick={() => { openDialog(null) }}
+                            onClick={() => {
+                                openDialog()
+                            }}
                         >
                             <Plus size={16} />
-                            Tambah Poli
+                            Tambah Kunjungan
                         </Button>
                     </div>
-
-                    {/* Card Tabel */}
+                    
                     <div className="card overflow-hidden mt-6">
-
-                        {/* Card Header */}
-                        <div 
-                            className="px-5 py-4 flex items-center justify-between"
-                            style={{ borderBottom: '1px solid var(--border-default)' }}
-                        >
-                            <div>
-                                <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                                    Data Poli
-                                </h2>
-                                <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                                    {poliList.length} data ditemukan
-                                </p>
-                            </div>
-                        </div>
-
                         {/* Tabel */}
                         <div className="overflow-x-auto">
                             <table className="data-table">
                                 <thead>
                                     <tr>
-                                        <th className="text-center">Nama Poli</th>
-                                        <th className="text-center">Terakhir Diubah</th>
+                                        <th className="text-center">Tanggal</th>
+                                        <th className="text-center">Total Kunjungan</th>
                                         <th className="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {poliList.length === 0 ? (
+                                    {kunjunganList.length === 0 ? (
                                         <tr>
                                             <td colSpan={4}>
                                                 <div 
@@ -85,33 +75,21 @@ export default function PoliPage(){
                                             </td>
                                         </tr>
                                     ) : (
-                                        poliList.map(r => (
-                                            <tr key={r.id}>
+                                        kunjunganList.map(r => (
+                                            <tr key={r.tanggal}>
                                                 <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                                                    {r.nama_poli}
+                                                    {format(new Date(r.tanggal), 'EEEE, dd MMMM yyyy', { locale: localeId })}
                                                 </td>
                                                 <td className="text-center" style={{ color: 'var(--text-secondary)' }}>
-                                                    {r.updated_at
-                                                        ? new Date(r.updated_at).toLocaleDateString('id-ID', {
-                                                            day: '2-digit', month: 'short',
-                                                            year: 'numeric', hour: '2-digit', minute: '2-digit',
-                                                        })
-                                                        : '-'}
+                                                    {r.total_pasien} pasien
                                                 </td>
                                                 <td className="text-center">
                                                     <div className="flex items-center justify-center gap-2">
                                                         <Button 
                                                             variant="edit"
                                                             size='icon'
-                                                            onClick={() => openDialog(r)}
-                                                        ><Pencil size={16} />
-                                                        </Button>
-
-                                                        <Button 
-                                                            variant="destructive"
-                                                            size='icon'
-                                                            onClick={() => handleDelete(r.id)}
-                                                        > <Trash2 size={16} />
+                                                            onClick={() => openDialog(r.detail)}
+                                                        ><Eye size={16} />
                                                         </Button>
                                                     </div>
                                                 </td>
@@ -121,9 +99,8 @@ export default function PoliPage(){
                                 </tbody>
                             </table>
                         </div>
-
                         {/* Footer */}
-                        {poliList.length > 0 && (
+                        {/* {poliList.length > 0 && (
                             <div 
                                 className="px-5 py-3"
                                 style={{ borderTop: '1px solid var(--border-default)' }}
@@ -132,22 +109,22 @@ export default function PoliPage(){
                                     Total {poliList.length} poliklinik
                                 </p>
                             </div>
-                        )}
+                        )} */}
                     </div>
-
-                    <ManagePoliDialog
+                            
+                    <ManageKunjunganDialog
                         open={isOpenManageDialog}
-                        editData={editData}
-                        onSubmit={handleSubmit}
+                        detailData={kunjunganHarian}
+                        // editData={editData}
+                        // onSubmit={handleSubmit}
                         onClose={ onCloseDialog }
                     />
-
                     <LoadingDialog
                         open={isLoadingDialog}
                         message="Memproses..."
                     />
                 </div>
-            )}
+            ) }
         </div>
     )
 }

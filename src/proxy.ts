@@ -1,8 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PUBLIC_PATHS    = ['/login']
 const PROTECTED_PATHS = ['/poli', '/vaksin', '/kunjungan', '/vaksinasi']
-
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({request})
@@ -31,34 +31,37 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+ // Cek session dari cookie — tidak fetch ke DB
+  const { data: { session } } = await supabase.auth.getSession()
+  const isPublicPath    = PUBLIC_PATHS.includes(pathname)
+  const isProtectedPath = PROTECTED_PATHS.some(p => pathname.startsWith(p))
 
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Belum login → redirect ke /login
-  if (!user && pathname !== '/login') {
+  // Tidak ada session → redirect ke login
+  if (!session && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Sudah login tapi buka /login → redirect ke dashboard
-  if (user && pathname === '/login') {
+  // Ada session tapi buka /login → redirect ke dashboard
+  if (session && isPublicPath) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Role public tidak boleh akses halaman CRUD
-  if (user && PROTECTED_PATHS.some(p => pathname.startsWith(p))) {
+  // Ada session → cek role untuk protected path
+  if (session && isProtectedPath) {
     const { data: profile } = await supabase
       .from('users')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', session.user.id)
       .single()
 
+    // Role public → tidak boleh akses CRUD
     if (profile?.role === 'public') {
       return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // User tidak ditemukan → paksa logout
+    if (!profile) {
+      return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 

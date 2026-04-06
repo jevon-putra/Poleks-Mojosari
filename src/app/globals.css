@@ -117,6 +117,17 @@ body {
     box-shadow: 0 0 0 3px rgba(46,134,171,0.2);
   }
 
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
 
   /* ── CARD adaptif ── */
   .card {

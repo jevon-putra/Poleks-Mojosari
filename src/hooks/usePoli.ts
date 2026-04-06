@@ -71,7 +71,7 @@ export function usePoli(usedId: String) {
             }).finally(() => setLoadingDialog(false))
         } else {
             createPoli(name, usedId).then(res => {
-                toast.success('Data berhasil diperbarui')
+                toast.success('Data berhasil ditambahkan')
                 onCloseDialog(res)
             }).catch(err => {
                 if(err.message.includes('unique')) {

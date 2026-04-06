@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="id" className="dark">
       <body className={inter.className}>
-        <div className="flex min-h-screen" style={{ background: 'var(--bg-page)' }}>
+        <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-page)' }}>
           <Sidebar />
           <main className="flex-1 overflow-auto pt-14 lg:pt-0" style={{ background: 'var(--bg-page)' }}>
             {children}

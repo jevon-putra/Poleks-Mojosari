@@ -3,16 +3,18 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
+import { userCache } from "@/lib/userCache"
+import { fetchUserProfile } from "@/service/user.service"
 import { Lock, Mail, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail]           = useState('')
-  const [password, setPassword]     = useState('')
-  const [loading, setLoading]       = useState(false)
+  const router                          = useRouter()
+  const [email, setEmail]               = useState('')
+  const [password, setPassword]         = useState('')
+  const [loading, setLoading]           = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -20,12 +22,17 @@ export default function LoginPage() {
     setLoading(true)
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
       toast.error(error.message)
       setLoading(false)
       return
+    }
+
+    if(data.user){
+      var profile = await fetchUserProfile(data.user.id)
+      if(profile) userCache.set(profile)
     }
 
     router.push('/')
@@ -81,7 +88,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-xs" style={{ color: 'var(--blue-medium)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
           Made with ❤️ by OpelHunter
         </p>
       </div>
