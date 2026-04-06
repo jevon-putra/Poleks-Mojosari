@@ -104,12 +104,12 @@ export function Sidebar() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate"
               style={{ color: 'var(--text-primary)' }}>
-              {isMounted ? user?.full_name! : 'Nurse'}
+              {isMounted ? user?.full_name ?? 'Nurse' : 'Nurse'}
             </p>
             {/* Role badge */}
             <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-regular mt-0.5"
               style={{ background: badge.bg, color: badge.color }}>
-              {(isMounted ? user?.role! : "Public").toUpperCase()}
+              {(isMounted ? user?.role ?? "Public" : "Public").toUpperCase()}
             </span>
           </div>
         </div>
