@@ -1,7 +1,8 @@
 'use client'
 
-import { StatisticCard } from "@/components/dashboard/statistic_card";
-import { VisitChart } from "@/components/dashboard/visit_chart";
+import { DashboardSkeleton } from "@/components/page/dashboard/DashboardSkeleton";
+import { StatisticCard } from "@/components/page/dashboard/StatisticCard";
+import { VisitChart } from "@/components/page/dashboard/VisitChart";
 import { useDashboard } from "@/hooks/useDashboard";
 import { format } from "date-fns/format";
 import { id as localeId } from 'date-fns/locale'
@@ -13,10 +14,10 @@ export default function Home() {
   } = useDashboard()
   const currentDate = new Date();
 
-  if(isLoading) return;
+  if(isLoading) return <DashboardSkeleton />;
 
-  console.log(dashboardData?.currentWeeklyVisit)
-  console.log(dashboardData?.lastWeekVisit)
+  // console.log(dashboardData?.currentWeeklyVisit)
+  // console.log(dashboardData?.lastWeekVisit)
 
   return (
     <div className="p-6 w-full flex flex-col gap-4">

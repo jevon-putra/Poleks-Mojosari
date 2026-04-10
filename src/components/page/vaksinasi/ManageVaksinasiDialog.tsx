@@ -181,11 +181,11 @@ export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: M
                                             style={{
                                                 background: index % 2 === 0
                                                     ? 'var(--bg-input)'
-                                                    : 'var(--bg-card)',   // ← zebra stripe
+                                                    : 'var(--bg-card)',
                                             }}
                                         >
                                             <span
-                                                className="text-sm font-medium truncate"
+                                                className="text-sm font-medium truncate flex-1"
                                                 style={{ color: 'var(--text-primary)' }}
                                             >
                                                 {data.nama_vaksin}

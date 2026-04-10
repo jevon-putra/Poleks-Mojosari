@@ -4,96 +4,84 @@ import { getWeeklyVisit, getWeeklyDose, getMonthlyVisit, getMonthlyDose } from "
 import { getPoli } from "@/service/poli.service"
 import { getVaccine } from "@/service/vaccine.service"
 import { DashboardData } from "@/types/index.types"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { toast } from "sonner"
 
 export function useDashboard() {
-    const [dashboardData, setDashboardData] = useState<DashboardData>()
+    const [dashboardData, setDashboardData] = useState<Partial<DashboardData>>({})
     const [isLoading, setLoading] = useState(true)
-    const date = new Date()
 
-    async function getDataDashboard() {
+    const calculateTotal = (data: any[], key: string) => 
+        data.reduce((acc, d) => acc + (d[key] || 0), 0);
+
+    const fetchData = useCallback(async () => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        // Handle logika tahun jika bulan sekarang Januari (0)
+        const lastMonthDate = new Date(currentYear, currentMonth - 1);
+        const prevMonth = lastMonthDate.getMonth();
+        const prevYear = lastMonthDate.getFullYear();
+
         try {
-            const [
-                listPoli,
-                listVaksin,
-                weeklyVisitThisWeek,
-                weeklyVisitLastWeek,
-
-                monthlyVisitCurrentMonth,
-                monthlyVisitLastMonth,
-
-                weeklyDoseThisWeek,
-                weeklyDoseLastWeek,
-                
-                monthlyDoseCurrentMonth,
-                monthlyDoseLastMonth,
-            ] = await Promise.all([
+            // Tahap 1: Ambil data Master & Kunjungan (Prioritas Utama UI)
+            const [listPoli, weeklyCurrent, weeklyLast, monthlyCurrent, monthlyLast] = await Promise.all([
                 getPoli(),
+                getWeeklyVisit(false),
+                getWeeklyVisit(true),
+                getMonthlyVisit(currentMonth, currentYear),
+                getMonthlyVisit(prevMonth, prevYear)
+            ]);
+
+            setDashboardData(prev => ({
+                ...prev,
+                listPoli,
+                currentWeeklyVisit: weeklyCurrent,
+                lastWeekVisit: weeklyLast,
+                cureentMonthlyVisit: monthlyCurrent,
+                lastMonthVisit: monthlyLast,
+                totalVisitCurrentWeek: calculateTotal(weeklyCurrent, 'jumlah_pasien'),
+                totalVisitLastWeek: calculateTotal(weeklyLast, 'jumlah_pasien'),
+                totalVisitCurrentMonth: calculateTotal(monthlyCurrent, 'jumlah_pasien'),
+                totalVisitLastMonth: calculateTotal(monthlyLast, 'jumlah_pasien'),
+            }));
+
+            // Tahap 2: Ambil data Vaksin (Background/Secondary)
+            const [listVaksin, doseWCurrent, doseWLast, doseMCurrent, doseMLast] = await Promise.all([
                 getVaccine(),
-                getWeeklyVisit(false),   
-                getWeeklyVisit(true),    
-
-                getMonthlyVisit(date.getMonth(), date.getFullYear()),
-                getMonthlyVisit(date.getMonth() - 1, date.getFullYear()),
-
                 getWeeklyDose(false),
                 getWeeklyDose(true),
+                getMonthlyDose(currentMonth, currentYear),
+                getMonthlyDose(prevMonth, prevYear)
+            ]);
 
-                getMonthlyDose(date.getMonth(), date.getFullYear()),
-                getMonthlyDose(date.getMonth() - 1, date.getFullYear()),
-            ])
-            const totalVisitThisMonth = monthlyVisitCurrentMonth.reduce((acc, d) => acc + d.jumlah_pasien, 0)
-            const totalVisitLastMonth = monthlyVisitLastMonth.reduce((acc, d) => acc + d.jumlah_pasien, 0)
-
-            const totalDoseThisMonth = monthlyDoseCurrentMonth.reduce((acc, d) => acc + d.jumlah_dosis, 0)
-            const totalDoseLastMonth = monthlyDoseLastMonth.reduce((acc, d) => acc + d.jumlah_dosis, 0)
-
-            const totalVisitThisWeek = weeklyVisitThisWeek.reduce((acc, d) => acc + d.jumlah_pasien, 0)
-            const totalVisitLastWeek = weeklyVisitLastWeek.reduce((acc, d) => acc + d.jumlah_pasien, 0)
-
-            const totalDoseThisWeek = weeklyDoseThisWeek.reduce((acc, d) => acc + d.jumlah_dosis, 0)
-            const totalDoseLastWeek = weeklyDoseLastWeek.reduce((acc, d) => acc + d.jumlah_dosis, 0)
-
-            setDashboardData({
-                listPoli,
+            setDashboardData(prev => ({
+                ...prev,
                 listVaksin,
-                
-                currentWeeklyVisit: weeklyVisitThisWeek,
-                lastWeekVisit: weeklyVisitLastWeek,
-                cureentMonthlyVisit: monthlyVisitCurrentMonth,
-                lastMonthVisit: monthlyVisitLastMonth,
+                currentWeeklyDose: doseWCurrent,
+                lastWeekDose: doseWLast,
+                currentMonthlyDose: doseMCurrent,
+                lastMonthDose: doseMLast,
+                totalDoseCurrentWeek: calculateTotal(doseWCurrent, 'jumlah_dosis'),
+                totalDoseLastWeek: calculateTotal(doseWLast, 'jumlah_dosis'),
+                totalDoseCurrentMonth: calculateTotal(doseMCurrent, 'jumlah_dosis'),
+                totalDoseLastMonth: calculateTotal(doseMLast, 'jumlah_dosis'),
+            }));
 
-                currentWeeklyDose: weeklyDoseThisWeek,
-                lastWeekDose: weeklyDoseLastWeek,
-                currentMonthlyDose: monthlyDoseCurrentMonth,
-                lastMonthDose: monthlyDoseLastMonth,
-
-                totalVisitCurrentWeek: totalVisitThisWeek,
-                totalVisitLastWeek: totalVisitLastWeek,
-
-                totalVisitCurrentMonth: totalVisitThisMonth,
-                totalVisitLastMonth: totalVisitLastMonth,
-
-                totalDoseCurrentWeek: totalDoseThisWeek,
-                totalDoseLastWeek: totalDoseLastWeek,
-     
-                totalDoseCurrentMonth: totalDoseThisMonth,
-                totalDoseLastMonth: totalDoseLastMonth
-            })
         } catch (err: any) {
-            toast.error(err.message)
+            toast.error(err.message || "Gagal memuat data dashboard");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
-    
+    }, []);
+
     useEffect(() => {
-        getDataDashboard()
-    }, [])
-    
+        fetchData();
+    }, [fetchData]);
+
     return {
         isLoading,
-        dashboardData,
+        dashboardData: dashboardData as DashboardData,
     }
 }

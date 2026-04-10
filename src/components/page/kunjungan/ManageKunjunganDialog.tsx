@@ -179,7 +179,7 @@ export function ManageKunjunganDialog({ open, detailData, onSubmit, onClose }: M
                                             style={{
                                                 background: index % 2 === 0
                                                     ? 'var(--bg-input)'
-                                                    : 'var(--bg-card)',   // ← zebra stripe
+                                                    : 'var(--bg-card)',
                                             }}
                                         >
                                             <span
