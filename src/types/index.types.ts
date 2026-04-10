@@ -53,6 +53,12 @@ export interface UserProfile {
 }
 
 // ─── Form Payloads (untuk create/update) ──────────
+export interface VaksinasiGrouped {
+  tanggal:      string
+  total_vaksin: number
+  detail:       VaksinasiHarian[]
+}
+
 export interface KunjunganGrouped {
   tanggal:      string
   total_pasien: number
@@ -69,4 +75,51 @@ export type VaksinasiPayload = {
   tanggal: string
   vaksin_id: string
   jumlah_dosis: number
+}
+
+//DASHBOARD
+export interface MonthlyKunjungan {
+  tanggal: string,
+  jumlah_pasien: number
+}
+
+export interface MonthlyVaksinasi {
+  tanggal: string,
+  jumlah_dosis: number
+}
+
+export interface WeeklyKunjungan {
+  nama_poli: string
+  jumlah_pasien: number
+}
+
+export interface WeeklyVaksinasi {
+  nama_vaksin: string
+  jumlah_dosis: number
+}
+
+export interface DashboardData {
+  listPoli: Poliklinik[]
+  listVaksin: Vaksin[]
+  cureentMonthlyVisit: MonthlyKunjungan[]
+  lastMonthVisit: MonthlyKunjungan[]
+  currentWeeklyVisit: WeeklyKunjungan[]
+  lastWeekVisit: WeeklyKunjungan[]
+
+  currentMonthlyDose: MonthlyVaksinasi[]
+  lastMonthDose: MonthlyVaksinasi[]
+  currentWeeklyDose: WeeklyVaksinasi[]
+  lastWeekDose: WeeklyVaksinasi[]
+
+  totalVisitCurrentWeek: number
+  totalVisitLastWeek: number
+  
+  totalDoseCurrentWeek: number
+  totalDoseLastWeek: number
+
+  totalVisitCurrentMonth: number
+  totalVisitLastMonth: number
+
+  totalDoseCurrentMonth: number
+  totalDoseLastMonth: number
 }
