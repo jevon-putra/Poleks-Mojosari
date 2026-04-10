@@ -53,7 +53,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
 
         const fourDaysAgo = new Date()
         fourDaysAgo.setHours(0, 0, 0, 0)
-        fourDaysAgo.setDate(today.getDate() - 4)
+        fourDaysAgo.setDate(today.getDate() - 7)
 
         const isEditable = dateData >= fourDaysAgo && dateData <= today
 
