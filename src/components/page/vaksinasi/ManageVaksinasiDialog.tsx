@@ -13,14 +13,16 @@ import { id as localeId } from 'date-fns/locale'
 import { ChevronDownIcon, Loader2 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { useVaccinate } from "@/hooks/useVaccinate"
+import { on } from "events"
 
 interface ManageVaksinasiDialogProps {
     open: boolean
     detailData: VaksinasiHarian[] | null
+    onSubmit: (payload: VaksinasiPayload[]) => void
     onClose: () => void
 }
 
-export function ManageVaksinasiDialog({ open, detailData, onClose }: ManageVaksinasiDialogProps) {
+export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: ManageVaksinasiDialogProps) {
     const { get }                                   = userCache
     const [inputs, setInputs]                       = useState<Record<string, string>>({})
     const [date, setDate]                           = React.useState<Date>(new Date())
@@ -88,7 +90,7 @@ export function ManageVaksinasiDialog({ open, detailData, onClose }: ManageVaksi
 
     if (payload.length === 0) return
 
-    addVaksinasi(payload)
+    onSubmit(payload)
   }
 
   const totalPasien = Object.values(inputs).reduce((sum, val) => sum + (Number(val) || 0), 0)
@@ -171,20 +173,23 @@ export function ManageVaksinasiDialog({ open, detailData, onClose }: ManageVaksi
                                 <span className="text-sm">Belum ada data vaksin</span>
                                 </div>
                             ) : (
-                                <div className="space-y-2 max-h-64 overflow-y-auto">
-                                    {vaksinList.map(poli => (
+                                <div className="max-h-64 overflow-y-auto">
+                                    {vaksinList.map((data, index) => (
                                         <div
-                                            key={poli.id}
-                                            className="flex items-center gap-3 rounded-lg transition-colors"
+                                            key={data.id}
+                                            className="flex items-center gap-3 px-2 py-2"
+                                            style={{
+                                                background: index % 2 === 0
+                                                    ? 'var(--bg-input)'
+                                                    : 'var(--bg-card)',   // ← zebra stripe
+                                            }}
                                         >
-                                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                <span
-                                                    className="text-sm font-medium truncate"
-                                                    style={{ color: 'var(--text-primary)' }}
-                                                >
-                                                    {poli.nama_vaksin}
-                                                </span>
-                                            </div>
+                                            <span
+                                                className="text-sm font-medium truncate"
+                                                style={{ color: 'var(--text-primary)' }}
+                                            >
+                                                {data.nama_vaksin}
+                                            </span>
 
                                             {/* Input jumlah — kanan, fixed width */}
                                             <div className="flex items-center gap-1 shrink-0">
@@ -192,8 +197,8 @@ export function ManageVaksinasiDialog({ open, detailData, onClose }: ManageVaksi
                                                     type="number"
                                                     min="0"
                                                     max="100"
-                                                    value={inputs[poli.id] ?? ''}
-                                                    onChange={e => handleInputChange(poli.id, e.target.value)}
+                                                    value={inputs[data.id] ?? ''}
+                                                    onChange={e => handleInputChange(data.id, e.target.value)}
                                                     placeholder="0"
                                                     variant="default"
                                                     className="input-field"

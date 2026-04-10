@@ -1,18 +1,14 @@
 'use client'
 
-import { ManageKunjunganDialog } from "@/components/page/kunjungan/ManageKunjunganDialog"
 import { Button } from "@/components/ui/button"
 import { LoadingDialog } from "@/components/ui/LoadingDialog"
-import { useKunjungan } from "@/hooks/useKunjungan"
 import { userCache } from "@/lib/userCache"
 import { Eye, Plus } from "lucide-react"
 import { useEffect } from "react"
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 import { KunjunganSkeleton } from "@/components/page/kunjungan/KunjunganSkeleton"
-import { useVaccine } from "@/hooks/useVaccine"
 import { useVaccinate } from "@/hooks/useVaccinate"
-import { ManageVaccineDialog } from "@/components/page/vaccine/ManageVaccineDialog"
 import { ManageVaksinasiDialog } from "@/components/page/vaksinasi/ManageVaksinasiDialog"
 
 export default function VaksinasiPage() {
@@ -24,6 +20,7 @@ export default function VaksinasiPage() {
         vaksinasiList,
         vaksinHarian,
 
+        addVaksinasi,
         openDialog,
         onCloseDialog,
         getGroupVaccine
@@ -130,8 +127,7 @@ export default function VaksinasiPage() {
             <ManageVaksinasiDialog
                 open={isOpenManageDialog}
                 detailData={vaksinHarian}
-                // editData={editData}
-                // onSubmit={handleSubmit}
+                onSubmit={addVaksinasi}
                 onClose={ onCloseDialog }
             />
             <LoadingDialog

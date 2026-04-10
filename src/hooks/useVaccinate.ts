@@ -43,7 +43,7 @@ export function useVaccinate(userId: string) {
         const rows = payload.map(p => ({
             tanggal         : p.tanggal,
             vaksin_id       : p.vaksin_id,
-            jumlah_dosis   : p.jumlah_dosis,
+            jumlah_dosis    : p.jumlah_dosis,
             created_by      : userId,
             updated_by      : userId,
         }))

@@ -17,10 +17,11 @@ import { Calendar } from "@/components/ui/calendar"
 interface ManageKunjunganDialogProps {
     open: boolean
     detailData: KunjunganHarian[] | null
+    onSubmit: (payload: KunjunganPayload[]) => void
     onClose: () => void
 }
 
-export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunjunganDialogProps) {
+export function ManageKunjunganDialog({ open, detailData, onSubmit, onClose }: ManageKunjunganDialogProps) {
     const { get }                                   = userCache
     const [inputs, setInputs]                       = useState<Record<string, string>>({})
     const [date, setDate]                           = React.useState<Date>(new Date())
@@ -29,7 +30,6 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
     const {
         isLoadingDialog,
         getListPoli,
-        addKunjungan,
         poliList,
     } = useKunjungan(get()?.id || '')
 
@@ -88,7 +88,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
 
     if (payload.length === 0) return
 
-    addKunjungan(payload)
+    onSubmit(payload)
   }
 
   const totalPasien = Object.values(inputs).reduce((sum, val) => sum + (Number(val) || 0), 0)
@@ -171,20 +171,23 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
                                 <span className="text-sm">Belum ada data poliklinik</span>
                                 </div>
                             ) : (
-                                <div className="space-y-2 max-h-64 overflow-y-auto">
-                                    {poliList.map(poli => (
+                                <div className="max-h-64 overflow-y-auto">
+                                    {poliList.map((poli, index) => (
                                         <div
                                             key={poli.id}
-                                            className="flex items-center gap-3 rounded-lg transition-colors"
+                                            className="flex items-center gap-3 px-2 py-2"
+                                            style={{
+                                                background: index % 2 === 0
+                                                    ? 'var(--bg-input)'
+                                                    : 'var(--bg-card)',   // ← zebra stripe
+                                            }}
                                         >
-                                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                <span
-                                                    className="text-sm font-medium truncate"
-                                                    style={{ color: 'var(--text-primary)' }}
-                                                >
-                                                    {poli.nama_poli}
-                                                </span>
-                                            </div>
+                                            <span
+                                                className="text-sm font-medium truncate flex-1"
+                                                style={{ color: 'var(--text-primary)' }}
+                                            >
+                                                {poli.nama_poli}
+                                            </span>
 
                                             {/* Input jumlah — kanan, fixed width */}
                                             <div className="flex items-center gap-1 shrink-0">

@@ -22,6 +22,7 @@ export default function KunjunganPage() {
 
         openDialog,
         onCloseDialog,
+        addKunjungan,
         getKunjungan
     } = useKunjungan(get()?.id || '')
 
@@ -126,8 +127,7 @@ export default function KunjunganPage() {
             <ManageKunjunganDialog
                 open={isOpenManageDialog}
                 detailData={kunjunganHarian}
-                // editData={editData}
-                // onSubmit={handleSubmit}
+                onSubmit={ addKunjungan }
                 onClose={ onCloseDialog }
             />
             <LoadingDialog
