@@ -1,11 +1,10 @@
 'use client'
 
-import { KunjunganHarian, KunjunganPayload } from "@/types/index.types"
+import { VaksinasiPayload, VaksinasiHarian } from "@/types/index.types"
 import { useEffect, useState } from "react"
 import { Button } from "../../ui/button"
 import { Input } from "../../ui/input"
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from "@/components/ui/dialog"
-import { useKunjungan } from "@/hooks/useKunjungan"
 import { userCache } from "@/lib/userCache"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import React from "react"
@@ -13,14 +12,15 @@ import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 import { ChevronDownIcon, Loader2 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
+import { useVaccinate } from "@/hooks/useVaccinate"
 
-interface ManageKunjunganDialogProps {
+interface ManageVaksinasiDialogProps {
     open: boolean
-    detailData: KunjunganHarian[] | null
+    detailData: VaksinasiHarian[] | null
     onClose: () => void
 }
 
-export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunjunganDialogProps) {
+export function ManageVaksinasiDialog({ open, detailData, onClose }: ManageVaksinasiDialogProps) {
     const { get }                                   = userCache
     const [inputs, setInputs]                       = useState<Record<string, string>>({})
     const [date, setDate]                           = React.useState<Date>(new Date())
@@ -28,22 +28,22 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
     const [isEnabledEdit, setEnabledEdit]           = useState(true)
     const {
         isLoadingDialog,
-        getListPoli,
-        addKunjungan,
-        poliList,
-    } = useKunjungan(get()?.id || '')
+        getListVaccine,
+        addVaksinasi,
+        vaksinList,
+    } = useVaccinate(get()?.id || '')
 
     useEffect(() => {
         if(open) {
             setDate(new Date())
             setEnabledInputDate(true)
-            getListPoli()
+            getListVaccine()
             setInputs({})
         }
     }, [open])
 
     useEffect(() => {
-        if (poliList.length === 0 || !detailData || detailData.length === 0) return
+        if (vaksinList.length === 0 || !detailData || detailData.length === 0) return
 
         const dateData = new Date(detailData[0].tanggal)
         dateData.setHours(0, 0, 0, 0)
@@ -62,12 +62,12 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
         setEnabledInputDate(false)
 
         detailData?.forEach(d => {
-            if (d.poliklinik_id) {
-                handleInputChange(d.poliklinik_id, d.jumlah_pasien?.toString() ?? '0')
+            if (d.vaksin_id) {
+                handleInputChange(d.vaksin_id, d.jumlah_dosis?.toString() ?? '0')
             }
         })
 
-    }, [poliList.length, detailData])
+    }, [vaksinList.length, detailData])
 
     if(!open) return null
 
@@ -78,17 +78,17 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const payload: KunjunganPayload[] = poliList
+    const payload: VaksinasiPayload[] = vaksinList
       .filter(p => inputs[p.id] && Number(inputs[p.id]) > 0)
       .map(p => ({
-        poliklinik_id:         p.id,
-        jumlah_pasien: Number(inputs[p.id] || 0),
+        vaksin_id:         p.id,
+        jumlah_dosis: Number(inputs[p.id] || 0),
         tanggal: format(date, "yyyy-MM-dd", { locale: localeId }),
       }))
 
     if (payload.length === 0) return
 
-    addKunjungan(payload)
+    addVaksinasi(payload)
   }
 
   const totalPasien = Object.values(inputs).reduce((sum, val) => sum + (Number(val) || 0), 0)
@@ -97,14 +97,14 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
         <Dialog open={open} onOpenChange={() => onClose()}>
             <DialogContent showCloseButton={true} preventClose>
                 <DialogHeader
-                    titleValue={detailData !== null ? 'Edit Kunjungan' : 'Tambah Kunjungan'}
-                    description={detailData !== null ? 'Edit Data Kunjungan' : 'Tambah Data Kunjungan'}
+                    titleValue={detailData !== null ? 'Edit Vaksinasi' : 'Tambah Vaksinasi'}
+                    description={detailData !== null ? 'Edit Data Vaksinasi' : 'Tambah Data Vaksinasi'}
                 />
 
                 <form  onSubmit={e => handleSubmit(e)}>
                     <DialogBody>
                         <div>
-                            <label className="form-label">Tanggal Kunjungan</label>
+                            <label className="form-label">Tanggal Vaksinasi</label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -148,10 +148,10 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
                             </Popover>
 
                             <div className="flex items-center justify-between py-2">
-                                <label className="form-label">Jumlah Pasien</label>
+                                <label className="form-label">Jumlah Vaksinasi</label>
                                 {totalPasien > 0 && (
                                     <span className="badge badge-blue">
-                                        Total: {totalPasien} pasien
+                                        Total: {totalPasien} Vaksinasi
                                     </span>
                                 )}
                             </div>
@@ -162,17 +162,17 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
                                 <div className="flex items-center justify-center py-8 gap-2"
                                 style={{ color: 'var(--text-muted)' }}>
                                 <Loader2 size={16} className="animate-spin" />
-                                <span className="text-sm">Memuat data poli...</span>
+                                <span className="text-sm">Memuat data vaksin...</span>
                                 </div>
-                            ) : poliList.length === 0 ? (
+                            ) : vaksinList.length === 0 ? (
                                 <div className="flex flex-col items-center py-8 gap-2"
                                 style={{ color: 'var(--text-muted)' }}>
                                 <span className="text-2xl">🏥</span>
-                                <span className="text-sm">Belum ada data poliklinik</span>
+                                <span className="text-sm">Belum ada data vaksin</span>
                                 </div>
                             ) : (
                                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                                    {poliList.map(poli => (
+                                    {vaksinList.map(poli => (
                                         <div
                                             key={poli.id}
                                             className="flex items-center gap-3 rounded-lg transition-colors"
@@ -182,7 +182,7 @@ export function ManageKunjunganDialog({ open, detailData, onClose }: ManageKunju
                                                     className="text-sm font-medium truncate"
                                                     style={{ color: 'var(--text-primary)' }}
                                                 >
-                                                    {poli.nama_poli}
+                                                    {poli.nama_vaksin}
                                                 </span>
                                             </div>
 
