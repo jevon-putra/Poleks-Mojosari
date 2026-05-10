@@ -13,7 +13,6 @@ import { id as localeId } from 'date-fns/locale'
 import { ChevronDownIcon, Loader2 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { useVaccinate } from "@/hooks/useVaccinate"
-import { on } from "events"
 
 interface ManageVaksinasiDialogProps {
     open: boolean
@@ -31,7 +30,6 @@ export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: M
     const {
         isLoadingDialog,
         getListVaccine,
-        addVaksinasi,
         vaksinList,
     } = useVaccinate(get()?.id || '')
 
@@ -164,19 +162,19 @@ export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: M
                                 <div className="flex items-center justify-center py-8 gap-2"
                                 style={{ color: 'var(--text-muted)' }}>
                                 <Loader2 size={16} className="animate-spin" />
-                                <span className="text-sm">Memuat data vaksin...</span>
+                                <span className="text-sm">Memuat data vaksinasi...</span>
                                 </div>
                             ) : vaksinList.length === 0 ? (
                                 <div className="flex flex-col items-center py-8 gap-2"
                                 style={{ color: 'var(--text-muted)' }}>
                                 <span className="text-2xl">🏥</span>
-                                <span className="text-sm">Belum ada data vaksin</span>
+                                <span className="text-sm">Belum ada data vaksinasi</span>
                                 </div>
                             ) : (
                                 <div className="max-h-64 overflow-y-auto">
-                                    {vaksinList.map((data, index) => (
+                                    {vaksinList.map((vaksin, index) => (
                                         <div
-                                            key={data.id}
+                                            key={vaksin.id}
                                             className="flex items-center gap-3 px-2 py-2"
                                             style={{
                                                 background: index % 2 === 0
@@ -188,7 +186,7 @@ export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: M
                                                 className="text-sm font-medium truncate flex-1"
                                                 style={{ color: 'var(--text-primary)' }}
                                             >
-                                                {data.nama_vaksin}
+                                                {vaksin.nama_vaksin}
                                             </span>
 
                                             {/* Input jumlah — kanan, fixed width */}
@@ -197,8 +195,8 @@ export function ManageVaksinasiDialog({ open, detailData, onSubmit, onClose }: M
                                                     type="number"
                                                     min="0"
                                                     max="100"
-                                                    value={inputs[data.id] ?? ''}
-                                                    onChange={e => handleInputChange(data.id, e.target.value)}
+                                                    value={inputs[vaksin.id] ?? ''}
+                                                    onChange={e => handleInputChange(vaksin.id, e.target.value)}
                                                     placeholder="0"
                                                     variant="default"
                                                     className="input-field"

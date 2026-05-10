@@ -32,11 +32,15 @@ export default function LoginPage() {
 
     if(data.user){
       var profile = await fetchUserProfile(data.user.id)
-      if(profile) userCache.set(profile)
-    }
+      if(profile){
+        userCache.set(profile)
 
-    router.push('/')
-    router.refresh()
+        router.push('/')
+        router.refresh()
+
+        console.log(profile)
+      }
+    }
   }
 
   return (

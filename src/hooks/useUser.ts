@@ -22,7 +22,6 @@ export function useUser() {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
     const supabase = createClient()
 
     const init = async () => {
@@ -43,7 +42,6 @@ export function useUser() {
       }
       
       const { data: { session } } = await supabase.auth.getSession()
-      if (cancelled) return
 
       if (!session?.user) {
         setLoading(false)
@@ -52,7 +50,6 @@ export function useUser() {
 
       // Ada session → fetch sekali, simpan cache
       const profile = await fetchUserProfile(session.user.id)
-      if (cancelled) return
 
       if (profile) {
         userCache.set(profile)
@@ -68,7 +65,6 @@ export function useUser() {
     // karena fetch sudah dilakukan di login page
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event) => {
-        if (cancelled) return
         if (event === 'SIGNED_OUT') {
           userCache.clear()
           setUser(null)
@@ -78,7 +74,6 @@ export function useUser() {
     )
 
     return () => {
-      cancelled = true
       subscription.unsubscribe()
     }
   }, [])
